@@ -1,0 +1,37 @@
+default:
+  tags:
+    - <runner-tag-name>
+
+
+#define stages
+stages:
+  - setup_workspace
+  - deploy
+
+
+# The before_script runs before any job in any stage.
+before_script:
+  - apt-get update
+  - apt install sudo -y 
+  - sudo apt-get update && sudo apt-get install -y gnupg software-properties-common wget curl jq 
+  - source ./.cicd/before.sh
+  - echo $WORKING_DIR
+  - terraform version
+  - terraform init
+
+
+# Upload terraform code (*.tf *.tfvars files)
+config_version:
+  stage: setup_workspace
+  script:
+  - source ./.cicd/setup_workspace.sh
+  retry:
+    max: 1
+    when: script_failure
+
+
+# Perform a terraform plan on Terraform Cloud, Apply will need to be done manually in TFC console
+deploy:
+  stage: deploy
+  script:
+  - source .cicd/deploy.sh
