@@ -1,3 +1,5 @@
+# This section retrieves the TFC_TOKEN from a dedicated Guardrail pipeline that securely stores the token in the customer's AWS account.
+# We are fetching the token from the stored secret in AWS Secrets Manager to use it in the current context.
 if [ "${ENVIRONMENT}" = "prd" ]
 then
 export lzTFC=aws secretsmanager get-secret-value --region us-east-1 --secret-id secret-name | jq -r ".SecretString"
